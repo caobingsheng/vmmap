@@ -1,4 +1,4 @@
-module mmap
+module vmmap
 
 import os
 
@@ -138,7 +138,7 @@ fn get_last_error_as_string() string {
 	// Free the Win32's string's buffer.
 	C.LocalFree(message_buffer)
 
-	return '($error_message_id) $message'
+	return '(${error_message_id}) ${message}'
 }
 
 // map_mmap_prot_page  Determine the windows code needed to set 'protection'
@@ -225,7 +225,7 @@ pub fn mmap(args MmapOptions) ?voidptr {
 	fm := C.CreateFileMapping(h, C.NULL, protect, dw_max_size_high, dw_max_size_low, C.NULL)
 	if fm == C.NULL {
 		msg := get_last_error_as_string()
-		return error('CreateFileMapping() failed: $msg')
+		return error('CreateFileMapping() failed: ${msg}')
 	} else {
 		defer {
 			C.CloseHandle(fm)
@@ -236,7 +236,7 @@ pub fn mmap(args MmapOptions) ?voidptr {
 		args.len)
 	if map == C.NULL {
 		msg := get_last_error_as_string()
-		return error('MapViewOfFile() failed: $msg')
+		return error('MapViewOfFile() failed: ${msg}')
 	}
 
 	return map
@@ -246,7 +246,7 @@ pub fn mmap(args MmapOptions) ?voidptr {
 pub fn munmap(addr voidptr, len u64) ? {
 	if C.UnmapViewOfFile(addr) == 0 {
 		msg := get_last_error_as_string()
-		return error('munmap() failed: $msg')
+		return error('munmap() failed: ${msg}')
 	}
 }
 
@@ -257,7 +257,7 @@ pub fn mprotect(addr voidptr, len u64, prot int) ? {
 
 	if C.VirtualProtect(addr, len, new_protect, &old_protect) == 0 {
 		msg := get_last_error_as_string()
-		return error('mprotect() failed: $msg')
+		return error('mprotect() failed: ${msg}')
 	}
 }
 
@@ -265,7 +265,7 @@ pub fn mprotect(addr voidptr, len u64, prot int) ? {
 pub fn msync(addr voidptr, len u64, flags int) ? {
 	if C.FlushViewOfFile(addr, len) == 0 {
 		msg := get_last_error_as_string()
-		return error('msync() failed: $msg')
+		return error('msync() failed: ${msg}')
 	}
 }
 
@@ -273,7 +273,7 @@ pub fn msync(addr voidptr, len u64, flags int) ? {
 pub fn mlock(addr voidptr, len u64) ? {
 	if C.VirtualLock(addr, len) == 0 {
 		msg := get_last_error_as_string()
-		return error('mlock() failed: $msg')
+		return error('mlock() failed: ${msg}')
 	}
 }
 
@@ -281,6 +281,6 @@ pub fn mlock(addr voidptr, len u64) ? {
 pub fn munlock(addr voidptr, len u64) ? {
 	if C.VirtualUnlock(addr, len) == 0 {
 		msg := get_last_error_as_string()
-		return error('munlock() failed: $msg')
+		return error('munlock() failed: ${msg}')
 	}
 }

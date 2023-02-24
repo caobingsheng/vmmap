@@ -1,9 +1,4 @@
-//
-//
-//
-module mmap
-
-import os
+module vmmap
 
 #include <sys/mman.h>
 
@@ -31,15 +26,15 @@ pub const (
 	ms_invalidate = C.MS_INVALIDATE
 )
 
-fn C.mmap(addr voidptr, len size_t, prot int, flags int, fd int, offset i64) voidptr
-fn C.munmap(addr voidptr, len size_t) int
-fn C.mprotect(addr voidptr, len size_t, prot int) int
-fn C.msync(addr voidptr, len size_t, flags int) int
-fn C.mlock(addr voidptr, len size_t) int
-fn C.munlock(addr voidptr, len size_t) int
+fn C.mmap(addr voidptr, len usize, prot int, flags int, fd int, offset i64) voidptr
+fn C.munmap(addr voidptr, len usize) int
+fn C.mprotect(addr voidptr, len usize, prot int) int
+fn C.msync(addr voidptr, len usize, flags int) int
+fn C.mlock(addr voidptr, len usize) int
+fn C.munlock(addr voidptr, len usize) int
 
 pub fn mmap(args MmapOptions) ?voidptr {
-	addr := C.mmap(args.addr, size_t(args.len), args.prot, args.flags, args.fd, args.offset)
+	addr := C.mmap(args.addr, usize(args.len), args.prot, args.flags, args.fd, args.offset)
 	if addr != C.MAP_FAILED {
 		return addr
 	}
@@ -104,37 +99,37 @@ pub fn mmap(args MmapOptions) ?voidptr {
 				'open for writing.')
 		}
 		else {
-			return error('($C.errno) Unknown error')
+			return error('(${C.errno}) Unknown error')
 		}
 	}
 }
 
 pub fn munmap(addr voidptr, len u64) ? {
 	if C.munmap(addr, len) != 0 {
-		return error('($C.errno) munmap() failed')
+		return error('(${C.errno}) munmap() failed')
 	}
 }
 
 pub fn mprotect(addr voidptr, len u64, prot int) ? {
 	if C.mprotect(addr, len, prot) != 0 {
-		return error('($C.errno) mprotect() failed')
+		return error('(${C.errno}) mprotect() failed')
 	}
 }
 
 pub fn msync(addr voidptr, len u64, flags int) ? {
 	if C.msync(addr, len, flags) != 0 {
-		return error('($C.errno) msync() failed')
+		return error('(${C.errno}) msync() failed')
 	}
 }
 
 pub fn mlock(addr voidptr, len u64) ? {
 	if C.mlock(addr, len) != 0 {
-		return error('($C.errno) mlock() failed')
+		return error('(${C.errno}) mlock() failed')
 	}
 }
 
 pub fn munlock(addr voidptr, len u64) ? {
 	if C.munlock(addr, len) != 0 {
-		return error('($C.errno) munlock() failed')
+		return error('(${C.errno}) munlock() failed')
 	}
 }

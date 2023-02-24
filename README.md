@@ -24,7 +24,7 @@ Additionally
 
 ```v
 	// Cast the memory mapped region to a byte array
-	pub fn to_byte_array(addr voidptr, len u64) []byte {
+	pub fn to_byte_array(addr voidptr, len u64) []u8 {
 ```
 
 and
@@ -39,11 +39,11 @@ and
 ## Example
 
 ```v
-import mmap
+import vmmap
 
 fn main() {
 	big_file_path := '../../MY_BIG_FILE.20180119104659.A901'
-	mut minfo := mmap.mmap_file(big_file_path)?
+	mut minfo := vmmap.mmap_file(big_file_path)?
 	defer { minfo.close() }
 
 	b := minfo.bytes

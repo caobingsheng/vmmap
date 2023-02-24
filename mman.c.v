@@ -1,4 +1,4 @@
-module mmap
+module vmmap
 
 // mmap This module provides memory mapping related functionalities.
 // The memory mapping functions are OS specific. The V-API is
@@ -8,17 +8,20 @@ import os
 // MmapOptions These are the mmap() function arguments
 pub struct MmapOptions {
 pub:
-	addr   voidptr = C.NULL 	  // No preferred virtual address
-	len    u64     = -1 		  // -1: use file size if fd != 0, else error
+	addr   voidptr = C.NULL // No preferred virtual address
+	len    u64     = u64(-1) // -1: use file size if fd != 0, else error
 	prot   int     = prot_read
 	flags  int     = map_shared
-	fd     int  /* = 0 */
-	offset u64  /* = 0 */	      // beginning of file
+	fd     int //= 0
+	offset u64 //= 0
+	// beginning of file
 }
 
-// vbytes Cast the memory mapped region to []byte
-pub fn (this MmapInfo) vbytes() []byte {
-	unsafe { return this.addr.vbytes(int(this.fsize)) }
+// vbytes Cast the memory mapped region to []u8
+pub fn (this MmapInfo) vbytes() []u8 {
+	unsafe {
+		return this.addr.vbytes(int(this.fsize))
+	}
 }
 
 // bytestr Cast the memory mapped region to string
@@ -33,12 +36,12 @@ pub mut:
 pub:
 	fsize u64
 	addr  voidptr
-	data  []byte
+	data  []u8
 }
 
 // close Unmap the memory mapped region and close the underlying file
 pub fn (mut this MmapInfo) close() {
-	munmap(this.addr, this.fsize) or { eprintln('ignored => $err') }
+	munmap(this.addr, this.fsize) or { eprintln('ignored => ${err}') }
 
 	this.fd.close()
 }
@@ -46,8 +49,8 @@ pub fn (mut this MmapInfo) close() {
 // mmap_file This is a convinience function to memory map a file's content for read-only
 pub fn mmap_file(file string) ?MmapInfo {
 	fsize := os.file_size(file)
-	mut f := os.open(file) ?
-	addr := mmap(len: fsize, prot: prot_read, flags: map_shared, fd: f.fd, offset: 0) ?
+	mut f := os.open(file) or { return none }
+	addr := mmap(len: fsize, prot: prot_read, flags: map_shared, fd: f.fd, offset: 0)?
 	return MmapInfo{
 		fd: f
 		fsize: u64(fsize)

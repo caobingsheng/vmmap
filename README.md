@@ -46,9 +46,9 @@ fn main() {
 	mut minfo := vmmap.mmap_file(big_file_path)?
 	defer { minfo.close() }
 
-	b := minfo.bytes
-	eprintln('src: $minfo.src')
-	eprintln('b.len after: $b.len')
+	b := minfo.vbytes()
+	eprintln('src: ${minfo.src()}')
+	eprintln('b.len after: ${b.len}')
 	eprintln('b starts with:')
 	eprintln(b[0..64].hex())
 
